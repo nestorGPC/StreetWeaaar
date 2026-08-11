@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#1a1a1a"/>
+  <path d="M200 260 Q300 170 400 260 L420 340 Q300 250 180 340 Z" fill="#2d2d2d"/>
+  <rect x="270" y="180" width="60" height="18" fill="#3a3a3a"/>
+  <text x="300" y="475" font-family="Arial, sans-serif" font-size="34" fill="#ffffff" text-anchor="middle" font-weight="bold">Gorra Snapback Negra</text>
+  <text x="300" y="525" font-family="Arial, sans-serif" font-size="24" fill="#b3b3b3" text-anchor="middle">StreetWear CR</text>
+</svg>

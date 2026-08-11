@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#1a1a1a"/>
+  <rect x="210" y="190" width="180" height="170" rx="18" fill="#2d2d2d"/>
+  <path d="M210 220 L300 290 L390 220" fill="none" stroke="#3a3a3a" stroke-width="14"/>
+  <text x="300" y="475" font-family="Arial, sans-serif" font-size="34" fill="#ffffff" text-anchor="middle" font-weight="bold">Bolso StreetWear</text>
+  <text x="300" y="525" font-family="Arial, sans-serif" font-size="24" fill="#b3b3b3" text-anchor="middle">StreetWear CR</text>
+</svg>

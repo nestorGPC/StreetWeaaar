@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#1a1a1a"/>
+  <circle cx="300" cy="260" r="110" fill="#2d2d2d"/>
+  <text x="300" y="475" font-family="Arial, sans-serif" font-size="34" fill="#ffffff" text-anchor="middle" font-weight="bold">Camiseta Oversize Negra</text>
+  <text x="300" y="525" font-family="Arial, sans-serif" font-size="24" fill="#b3b3b3" text-anchor="middle">StreetWear CR</text>
+</svg>
