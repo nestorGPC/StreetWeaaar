@@ -5,8 +5,8 @@
 
     RewriteEngine On
 
-    # Force HTTPS (alwaysdata) — required for SESSION_SECURE_COOKIE=true
-    RewriteCond %{HTTPS} off
+    # Force HTTPS (alwaysdata reverse proxy terminates TLS; uses X-Forwarded-Proto)
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Handle Authorization Header
