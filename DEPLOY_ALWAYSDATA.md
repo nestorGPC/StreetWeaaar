@@ -11,7 +11,8 @@ Guía paso a paso para publicar **StreetWear CR** en **alwaysdata Free**
 > - `USUARIO_ALWAYSDATA` → el nombre real de tu cuenta alwaysdata (aparece en la
 >   URL). **No lo inventes**: tómalo del panel tras crear la cuenta.
 > - `URL_ALWAYSDATA` → `https://USUARIO_ALWAYSDATA.alwaysdata.net`
-> - `TU_REPO_GITHUB` → ruta de tu repositorio, p. ej. `nestorGPC/StreetWear-CR`.
+> - `TU_REPO_GITHUB` → ruta de tu repositorio. Este despliegue usó
+>   `nestorGPC/StreetWeaaar` (el repo actualizado; `StreetWear-CR` quedó obsoleto).
 
 > **Importante**: este proyecto usa **SQLite** (requisito académico). No se
 > migra a MySQL/PostgreSQL y no se borra la base local.
@@ -76,10 +77,10 @@ Guía paso a paso para publicar **StreetWear CR** en **alwaysdata Free**
 
 ## 6. Configurar document root en /public
 
-- **Dónde**: panel → **Web > Sites > [sitio] > Modify** → **Application path**.
-- **Hacer**: apunta a la carpeta `public` del proyecto:
+- **Dónde**: panel → **Web > Sites > [sitio] > Modify** → **Root directory**.
+- **Hacer**: apunta a la carpeta `public` del proyecto (ruta **absoluta**):
   ```
-  /www/streetwear/public
+  /home/USUARIO_ALWAYSDATA/www/streetwear/public
   ```
 - **Resultado esperado**: el servidor solo sirve `public/`. `.env`, `database/`
   y `storage/` quedan fuera del alcance web.
@@ -122,9 +123,13 @@ Guía paso a paso para publicar **StreetWear CR** en **alwaysdata Free**
 - **Dónde**: SSH, dentro de `~/www/streetwear`.
 - **Comando exacto**:
   ```bash
-  composer install --no-dev --optimize-autoloader
+  composer install --optimize-autoloader
   ```
-- **Resultado esperado**: se crea `vendor/` sin paquetes de desarrollo.
+- **Resultado esperado**: se crea `vendor/`.
+- **Nota importante**: se instala **CON dependencias dev** a propósito. Los
+  seeders de pedidos usan factories que dependen de `fakerphp/faker`
+  (`require-dev`). Con `--no-dev`, `php artisan db:seed` falla con
+  `Call to undefined function fake()`.
 - **Si falla**:
   - `composer` no existe → `composer2 install`.
   - Reclama `pdo_sqlite`/`sqlite3` → completa el paso 5b y repite.
@@ -346,9 +351,14 @@ php artisan route:cache
 
 ## Notas finales
 
-- Tras cada actualización de código, repite: `git pull` → `composer install
-  --no-dev --optimize-autoloader` → `php artisan migrate --force` →
-  `php artisan optimize:clear` → `config:cache` → `view:cache`.
+- Tras cada actualización de código, usa `scripts/deploy-alwaysdata.sh`:
+  `git pull --ff-only` → `composer install --optimize-autoloader` →
+  `php artisan migrate --force` → `optimize:clear` → `config:cache` →
+  `view:cache` → `route:cache`.
 - No subas `.env`, `database.sqlite` ni `storage/` a Git: ya están en
   `.gitignore`.
 - No uses `migrate:fresh` sobre la base del servidor (borra datos de la demo).
+- **Advertencia**: no ejecutes `php artisan test` con `config:cache` activo:
+  los tests correrían con `APP_ENV=production` y fallarían con errores 419
+  (CSRF) y datos de configuración de producción. Limpia la caché
+  (`php artisan optimize:clear`) antes de correr tests y re-aplícala después.
