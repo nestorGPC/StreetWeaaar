@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Bitácora de Trabajo - StreetWear CR</title>
+<style>
+body { font-family: Arial, sans-serif; color:#000000; background:#FFFFFF; font-size:11pt; margin:2cm; }
+h1 { font-size:16pt; color:#000000; }
+h2 { font-size:13pt; color:#000000; border-bottom:1px solid #000000; }
+h3 { font-size:11pt; color:#000000; }
+p, li { color:#000000; }
+table { border-collapse:collapse; width:100%; margin:8pt 0; }
+th, td { border:1px solid #000000; padding:4pt 6pt; color:#000000; vertical-align:top; text-align:left; }
+th { font-weight:bold; }
+pre { font-family:"Courier New",monospace; color:#000000; background:#FFFFFF; border:1px solid #000000; padding:6pt; }
+code { font-family:"Courier New",monospace; color:#000000; }
+blockquote { color:#000000; border-left:2px solid #000000; padding-left:8pt; }
+</style>
+</head>
+<body>
+
+<h1>BITÁCORA DE TRABAJO — Proyecto Final StreetWear CR</h1>
+<p><b>Curso:</b> Tecnologías y Sistemas Web II (ITI-523) &nbsp;·&nbsp; <b>Componente:</b> Proceso de Trabajo y Bitácora<br>
+<b>Estudiante:</b> Nestor Palacios &nbsp;·&nbsp; <b>Repositorio:</b> github.com/nestorGPC/StreetWeaaar (rama main)<br>
+<b>Periodo:</b> 27 de julio – 24 de agosto de 2026 &nbsp;·&nbsp; <b>Control de versiones:</b> Git/GitHub</p>
+<blockquote>Toda entrada está respaldada por un commit verificable con <code>git log --oneline</code>.</blockquote>
+
+<h2>1. RESUMEN GENERAL DEL PROCESO</h2>
+<table>
+<tr><th>#</th><th>Fecha</th><th>Actividad principal</th><th>Commit</th><th>Impacto</th></tr>
+<tr><td>S1</td><td>27-jul</td><td>Creación del proyecto y base del catálogo</td><td>6b68270</td><td>126 archivos, +18.325 líneas</td></tr>
+<tr><td>S2</td><td>28-jul</td><td>Identidad del proyecto + búsqueda/filtros</td><td>bfe1f80, 3ce2980</td><td>+299 líneas</td></tr>
+<tr><td>S3</td><td>29-jul</td><td>Autenticación, checkout transaccional, pedidos, pagos, admin</td><td>e134dd5, 354b4cc</td><td>49 archivos, +3.330</td></tr>
+<tr><td>S4</td><td>29-jul</td><td>Cookies de productos recientes (rama de respaldo)</td><td>2991367</td><td>+184</td></tr>
+<tr><td>S5</td><td>10-ago</td><td>Integración final, despliegue alwaysdata y corrección HTTPS</td><td>33ed2b0 → d85c65b</td><td>209 archivos, +28.369</td></tr>
+<tr><td>S6</td><td>19-ago</td><td>Auditoría interna contra requisitos y plan priorizado</td><td>e758a65</td><td>+973 líneas</td></tr>
+<tr><td>S7</td><td>24-ago</td><td>Auditoría de los 32 puntos de la rúbrica + guías de defensa</td><td>1df358a, eefbbc5</td><td>+3.733 / −3.077</td></tr>
+<tr><td>S8</td><td>24-ago</td><td>Guía de pruebas y verificación final en hosting</td><td>c88e68f</td><td>+114</td></tr>
+</table>
+
+<h2>2. METODOLOGÍA DE TRABAJO</h2>
+<ul>
+<li>Desarrollo incremental con commits pequeños y mensajes descriptivos en español.</li>
+<li>Rama de respaldo <code>backup/pre-integracion-2026-08-10</code> creada antes de fusionar avances a <code>main</code>.</li>
+<li>Cada sesión cierra con: código funcionando → commit → nota en bitácora.</li>
+<li>Verificación continua con la suite de pruebas PHPUnit (41 tests / 129 assertions al cierre).</li>
+</ul>
+
+<h2>3. BITÁCORA POR SESIONES</h2>
+
+<h3>S1 — 27 de julio, 23:31 · Base del proyecto</h3>
+<p><b>Objetivo:</b> levantar el esqueleto de la tienda.<br>
+<b>Actividades:</b> creación del proyecto Laravel (PHP 8.2, SQLite); migraciones base (users, cache, jobs); modelos y migraciones de Category/Product; catálogo inicial con listado y detalle; layout Bootstrap con Vite.<br>
+<b>Problema/solución:</b> SQLite requería activar llaves foráneas → <code>foreign_key_constraints =&gt; true</code> en config/database.php.<br>
+<b>Evidencia:</b> commit <code>6b68270</code> (126 archivos).</p>
+
+<h3>S2 — 28 de julio · Identidad y búsqueda</h3>
+<p><b>Actividades:</b> renombrado y documentación con identidad StreetWear CR (<code>bfe1f80</code>); buscador por nombre (LIKE parametrizado) y filtros por categoría y rango de precio acumulables sobre un mismo query builder (<code>3ce2980</code>, +299 líneas).<br>
+<b>Problema/solución:</b> texto no numérico en precios rompía la consulta → guardas <code>filled()</code> + <code>is_numeric()</code>.<br>
+<b>Aprendizaje:</b> construir condiciones condicionales sobre un Query Builder evita consultas duplicadas por cada filtro.</p>
+
+<h3>S3 — 29 de julio (noche) · Núcleo comercial — sesión clave</h3>
+<p><b>Objetivo:</b> autenticación + proceso completo de compra + administración.<br>
+<b>Actividades:</b> AuthController (registro con rol customer automático, login/logout con throttle 5/min); migraciones orders/order_items/payments; checkout dentro de <code>DB::transaction</code> con <code>lockForUpdate</code> (anti sobreventa) y token de idempotencia comparado con <code>hash_equals</code>; generación de tracking único SWCR-FECHA-XXXXXX; panel de administración Filament con roles Spatie (super_admin/customer); seeders de datos demo (<code>354b4cc</code>).<br>
+<b>Problemas/soluciones:</b></p>
+<ul>
+<li>Doble clic creaba dos pedidos → token de un solo uso consumido con <code>session()-&gt;pull()</code>.</li>
+<li>Dos compras simultáneas podían vender el último stock → bloqueo pesimista por fila.</li>
+</ul>
+<p><b>Evidencia:</b> <code>e134dd5</code> (49 archivos, +3.330 líneas) + 2 tests de idempotencia.</p>
+
+<h3>S4 — 29 de julio · Productos vistos recientemente (cookies)</h3>
+<p><b>Actividades:</b> cookie recent_products (JSON, máx. 5 IDs, 30 días) escrita con <code>Cookie::queue</code> al ver un producto; sección "vistos recientemente" excluyendo el actual y mostrando solo activos.<br>
+<b>Problema/solución:</b> <code>whereIn</code> no conserva el orden → reordenamiento en PHP según posición del ID en la cookie.<br>
+<b>Evidencia:</b> commit <code>2991367</code> en rama de respaldo + 3 tests dedicados.</p>
+
+<h3>S5 — 10 de agosto · Integración, despliegue y HTTPS</h3>
+<p><b>Objetivo:</b> fusionar todo en main y publicar en hosting alwaysdata.<br>
+<b>Actividades:</b> integración consolidada (<code>33ed2b0</code>, 209 archivos); suite de pruebas completas (11 suites feature); reportes PDF con DomPDF (ventas por mes y por cliente protegidos con rol); script y documentación de despliegue (<code>e54994f</code>).<br>
+<b>Problema principal y solución:</b> el sitio quedaba en HTTP tras desplegar detrás del proxy inverso de alwaysdata. Primer intento con <code>RewriteCond %{HTTPS}</code> NO funcionaba porque el proxy termina el TLS. Lectura de cabeceras → redirección correcta usando X-Forwarded-Proto (<code>b33755e</code>, luego ajuste fino en <code>d85c65b</code>). Verificado: http→301→https.<br>
+<b>Aprendizaje:</b> detrás de un reverse proxy, las variables estándar de TLS no reflejan la realidad; hay que confiar en la cabecera que el proxy agrega.</p>
+
+<h3>S6 — 19 de agosto · Auditoría interna y planificación</h3>
+<p><b>Actividades:</b> revisión completa contra los requisitos del curso; identificación de brechas (pasarela de pagos pendiente, permisos granulares); plan de trabajo priorizado por criticidad.<br>
+<b>Evidencia:</b> commit <code>e758a65</code> (+973 líneas de documentación de auditoría).</p>
+
+<h3>S7 — 24 de agosto (madrugada) · Auditoría estricta de la rúbrica</h3>
+<p><b>Objetivo:</b> mapear los 32 puntos de la rúbrica oficial a código real.<br>
+<b>Actividades:</b> ejecución de pruebas exigidas (git status/remote/log, artisan test/about/migrate:status/route:list); verificación en vivo del hosting (HTTP 200, imágenes, CSS); corrección de permisos Filament Shield (73 permisos asignados al rol admin); creación de 32 documentos individuales + auditoría general + guía de defensa + banco de 63 preguntas/respuestas + índice de localización; eliminación de documentación obsoleta que contenía afirmaciones ya incorrectas.<br>
+<b>Resultados medibles:</b> 23 puntos cumplen · 3 con deficiencias documentadas · 6 administrativos · suite 41 passed / 129 assertions.<br>
+<b>Evidencia:</b> <code>1df358a</code> (+3.733) y <code>eefbbc5</code> (−3.077 de docs viejas).</p>
+
+<h3>S8 — 24 de agosto (mañana) · Guía de pruebas y verificación final</h3>
+<p><b>Actividades:</b> guía de pruebas automatizadas y manuales (cliente 19 pasos, admin 9, seguridad 6, responsive, smoke test de hosting); re-ejecución de la suite en verde; verificación del enlace público respondiendo 200.<br>
+<b>Evidencia:</b> commit <code>c88e68f</code>; URL https://nestor-alwaysdata-net.alwaysdata.net operativa.</p>
+
+<h2>4. ESTADÍSTICAS FINALES</h2>
+<ul>
+<li>Commits en main: 13 · Rama adicional de respaldo: 1 · Historial total: 16 entradas.</li>
+<li>Líneas acumuladas: más de 54.000 insertadas · Archivos versionados: 215 (sin vendor/node_modules/.env).</li>
+<li>Suite de pruebas: 41 tests, 129 assertions, 100% en verde al cierre.</li>
+<li>Despliegue: producción funcionando con HTTPS forzado y certificado gratuito.</li>
+</ul>
+
+<h2>5. LECCIONES APRENDIDAS</h2>
+<ol>
+<li>La consistencia de inventario exige transacción + bloqueo de fila + revalidación server-side; la sesión del carrito nunca es fuente de verdad para cobrar.</li>
+<li>La idempotencia (token de un solo uso) resuelve un problema real que ningún formulario "simple" cubre.</li>
+<li>Desplegar detrás de un proxy cambia supuestos básicos (HTTPS vía X-Forwarded-Proto).</li>
+<li>Auditar ANTES de entregar convierte supuestos en hechos verificables y detecta contradicciones entre documentación y código.</li>
+<li>Los tests primero parecen costo, después son la red que permite refactorizar sin miedo.</li>
+</ol>
+
+<h2>6. CÓMO VERIFICAR ESTA BITÁCORA (para el docente)</h2>
+<pre>git log --oneline --all            # historial completo
+git log --stat                     # detalle de archivos por commit
+git shortlog -sne                  # autoría
+git branch -a                      # rama de respaldo incluida</pre>
+
+</body>
+</html>

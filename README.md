@@ -207,17 +207,6 @@ php artisan config:cache
 php artisan view:cache
 ```
 
-Guía completa en `DEPLOY_ALWAYSDATA.md`.
-
-## Pruebas automáticas
-
-```bash
-php artisan test
-```
-
-Resultado actual: **41 passed / 129 assertions**. La suite completa se
-encuentra en `tests/Feature`.
-
 ## Seguridad
 
 - Autenticación de sesión con contraseñas hasheadas (bcrypt).
