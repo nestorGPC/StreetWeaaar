@@ -137,7 +137,7 @@ El seeder `UserSeeder` crea los siguientes usuarios:
 - Cambiar cantidades.
 - Ver subtotal, impuestos, envío y total.
 - Realizar el checkout ingresando una dirección.
-- Seleccionar método de pago (tarjeta o PayPal, modo demo).
+- Seleccionar método de pago (tarjeta en modo demo o **PayPal Sandbox** con cobro real de prueba).
 - Obtener número de seguimiento.
 - Consultar el historial de pedidos.
 - Ver el detalle de cada pedido propio.
@@ -162,15 +162,63 @@ Los reportes se generan en `/reportes` (solo super_admin):
 - `reporte-ventas.pdf`: total vendido, ventas por mes y por cliente.
 - `reporte-productos.pdf`: cantidad vendida y total generado por producto.
 
+## Pagos con PayPal Sandbox
+
+El checkout soporta dos métodos:
+
+- **Tarjeta**: flujo de demostración local (el pago queda en estado `pending`).
+- **PayPal**: integración real contra la API de PayPal Sandbox
+  (OAuth2 → creación de orden → aprobación del cliente → captura).
+  Al aprobar, el `Payment` se marca `paid` con su `transaction_id`
+  (capture ID de PayPal) y el pedido pasa a `processing`.
+
+Credenciales requeridas en `.env` (obtenerlas en
+https://developer.paypal.com/dashboard → Apps & Credentials → Sandbox):
+
+```env
+PAYPAL_SANDBOX_CLIENT_ID=
+PAYPAL_SANDBOX_CLIENT_SECRET=
+PAYPAL_SANDBOX_BASE_URL=https://api-m.sandbox.paypal.com
+PAYPAL_EXCHANGE_RATE=520
+```
+
+Nunca versionar las credenciales reales.
+
+## Despliegue en producción (alwaysdata)
+
+La aplicación está desplegada y disponible en:
+
+```text
+https://nestor-alwaysdata-net.alwaysdata.net
+```
+
+- Servidor: alwaysdata (PHP 8.4 + SQLite), aplicación en `~/www/streetwear`.
+- Document root: `/home/nestor-alwaysdata-net/www/streetwear/public`.
+- HTTPS con certificado automático de alwaysdata.
+- Assets compilados con Vite (`public/build`) — no requiere Node en producción.
+
+Para actualizar una versión ya desplegada:
+
+```bash
+cd ~/www/streetwear
+git pull --ff-only origin main
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan optimize:clear
+php artisan config:cache
+php artisan view:cache
+```
+
+Guía completa en `docs/DEPLOYMENT.md`.
+
 ## Pruebas automáticas
 
 ```bash
 php artisan test
 ```
 
-La suite cubre autenticación, catálogo, carrito, checkout, pedidos, pagos,
-perfil, cookies de productos recientes, idempotencia del checkout, límite de
-intentos de inicio de sesión y reportes.
+Resultado actual: **45 passed / 148 assertions** (incluye la suite de
+PayPal). El detalle por suite está documentado en `docs/PRUEBAS_UNITARIAS.md`.
 
 ## Seguridad
 
@@ -184,7 +232,8 @@ intentos de inicio de sesión y reportes.
 - Los estados de pedidos y pagos están restringidos a una lista fija.
 - Los productos inactivos no se pueden comprar ni agregar al carrito.
 - Las contraseñas y datos de tarjeta no se almacenan en la base de datos.
-- El pago se encuentra en modo demostración.
+- La tarjeta funciona en modo demostración; PayPal procesa cobros de prueba
+  reales dentro de Sandbox (dinero ficticio).
 
 ## Estructura del proyecto
 
