@@ -109,10 +109,8 @@ La aplicación estará disponible en `http://localhost:8000`.
 ## Documentación
 
 - `docs/MANUAL.md` — manual de usuario (cliente y administrador).
-- `docs/TECNICA.md` — documentación técnica (arquitectura, modelos, rutas, seguridad, decisiones).
+- `docs/BITACORA.md` — bitácora de trabajo del proyecto.
 - `docs/diagrama-uso-compra.md` — diagrama del proceso de compra.
-- `docs/DEPLOYMENT.md` — guía de despliegue y HTTPS.
-- `docs/DEFENSA.md` — preparación de la defensa oral.
 
 ## Usuarios de demostración
 
@@ -209,7 +207,7 @@ php artisan config:cache
 php artisan view:cache
 ```
 
-Guía completa en `docs/DEPLOYMENT.md`.
+Guía completa en `DEPLOY_ALWAYSDATA.md`.
 
 ## Pruebas automáticas
 
@@ -217,8 +215,8 @@ Guía completa en `docs/DEPLOYMENT.md`.
 php artisan test
 ```
 
-Resultado actual: **45 passed / 148 assertions** (incluye la suite de
-PayPal). El detalle por suite está documentado en `docs/PRUEBAS_UNITARIAS.md`.
+Resultado actual: **41 passed / 129 assertions**. La suite completa se
+encuentra en `tests/Feature`.
 
 ## Seguridad
 
