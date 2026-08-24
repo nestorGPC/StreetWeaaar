@@ -99,3 +99,19 @@ Repo: github.com/nestorGPC/StreetWeaaar · main sincronizada · rama backup/pre-
 
 AUDITORÍA
 docs/rubrica/01…32 · docs/AUDITORIA_RUBRICA_COMPLETA.md · docs/QUE_FALTA_ANTES_DE_ENTREGAR.md · docs/PREGUNTAS_Y_RESPUESTAS_DEFENSA.md
+
+TABLAS — UBICACIÓN FÍSICA
+Archivo BD: database/database.sqlite (SQLite, un solo archivo ~200 KB)
+Definiciones: database/migrations/*.php (9 migraciones)
+Modelos: app/Models/{User,Category,Product,Order,OrderItem,Payment}.php
+Negocio: users · categories · products · orders · order_items · payments
+Soporte: roles · permissions · model_has_roles · model_has_permissions · role_has_permissions · sessions · cache · cache_locks · jobs · job_batches · failed_jobs · password_reset_tokens · migrations
+Cómo verlas: DB Browser for SQLite → Abrir base de datos → database.sqlite
+
+COOKIES — UBICACIÓN FÍSICA
+Viven en el NAVEGADOR del cliente (NO hay archivo en el proyecto):
+Verla: F12 → Application → Cookies → dominio del sitio
+recent_products: JSON con IDs, máx 5, 30 días — creada por Cookie::queue() en ProductController@show (~línea 119)
+Buscar en VS Code: `Cookie::queue(`
+Cookie de sesión (ID) también es del navegador; los DATOS de la sesión viven servidor-side en la TABLA sessions de SQLite (SESSION_DRIVER=database)
+Concepto clave defensa: cookie = identificador en el cliente; tabla sessions = contenido en el servidor
